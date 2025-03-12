@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+ 
+}
+enum ROLE {
+  BEGINNER
+  INTERMEDIATE
+  EXPERIENCED
+}
+
+model User {
+  id            String                   @id @default(cuid())
+  email         String                   @unique
+  password      String?
+  name          String
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  role          ROLE                     @default(BEGINNER)
+
+  academics     USER_ACADEMICS_DETAILS? // One-to-one relationship
+  certification USER_CERTIFICATION[]     // One-to-many relationship
+  interest      USER_INTEREST[]          // One-to-many relationship
+  jobs          Job[]
+  roadmaps      RoadMaps[]
+}
+
+model USER_ACADEMICS_DETAILS {
+  id                    String   @id @default(cuid())
+  user_id               String   @unique
+  user                  User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  marks_10th_percentage Float
+  marks_12th_percentage Float
+  college_cgpa         Float?
+  degree               String
+  branch               String
+  createdAt            DateTime @default(now())
+}
+
+model USER_CERTIFICATION {
+  id               String   @id @default(cuid())
+  user_id          String
+  user             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  certificate_name String
+  platform         String?
+  issued_at        DateTime
+}
+
+model USER_INTEREST {
+  id        String  @id @default(cuid())
+  user_id   String
+  user      User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  interest  String?
+}
+
+model RoadMaps {
+  id          String           @id @default(cuid())
+  user_id     String
+  user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  career_path String
+  createdAt   DateTime         @default(now())
+  steps       RoadMap_steps[]
+}
+
+model RoadMap_steps {
+  id               String        @id @default(cuid())
+  roadmap_id       String
+  roadmap          RoadMaps      @relation(fields: [roadmap_id], references: [id], onDelete: Cascade)
+  step_order       Int
+  step_title       String
+  step_description String
+  resources        Resource[]
+  createdAt        DateTime      @default(now())
+}
+
+model Resource {
+  id        String         @id @default(cuid())
+  stepId    String
+  step      RoadMap_steps  @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  links     Link[]
+  videos    YouTubeVideo[]
+  courses   Course[]
+  books     Book[]
+}
+
+model Link {
+  id         String    @id @default(cuid())
+  url        String
+  resourceId String
+  resource   Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+}
+
+model YouTubeVideo {
+  id         String    @id @default(cuid())
+  title      String
+  url        String
+  resourceId String
+  resource   Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id         String    @id @default(cuid())
+  title      String
+  url        String
+  resourceId String
+  resource   Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+}
+
+model Book {
+  id         String    @id @default(cuid())
+  title      String
+  author     String
+  resourceId String
+  resource   Resource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id           String   @id @default(cuid())
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  job_title    String
+  company_name String
+  salary_range String
+  posted_at    DateTime
+}
