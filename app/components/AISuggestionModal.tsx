@@ -9,55 +9,52 @@ interface AISuggestionModalProps {
 }
 
 export default function AISuggestionModal({ isOpen, onClose, onSelect }: AISuggestionModalProps) {
-  const [customPath, setCustomPath] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [interests, setInterests] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleGenerateRoadmap = async () => {
+    if (!interests.trim()) {
+      setError('Please enter your interests');
+      return;
+    }
+
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      console.log('Sending request to generate roadmap...');
+      const response = await fetch('/api/generate-roadmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userInput: interests.trim()
+        }),
+      });
+
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Received roadmap data:', data);
+      
+      onSelect(data);
+      onClose();
+    } catch (error) {
+      console.error('Error generating roadmap:', error);
+      setError(error instanceof Error ? error.message : 'Failed to generate roadmap');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   if (!isOpen) return null;
-
-  const handleCustomSubmit = async () => {
-    if (customPath.trim()) {
-      setIsLoading(true);
-      setError('');
-      
-      try {
-        const response = await fetch('/api/generate-roadmap', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userInput: customPath }),
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to generate roadmap');
-        }
-
-        // Parse the roadmap JSON string from the API response
-        const roadmapData = JSON.parse(data.roadmap);
-        console.log('Received roadmap data:', roadmapData);
-        
-        if (!Array.isArray(roadmapData)) {
-          throw new Error('Invalid roadmap format received');
-        }
-
-        onSelect(roadmapData);
-        onClose();
-      } catch (error: any) {
-        console.error('Error generating roadmap:', error);
-        setError(error.message || 'Failed to generate roadmap. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleCustomSubmit();
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -78,18 +75,17 @@ export default function AISuggestionModal({ isOpen, onClose, onSelect }: AISugge
           <div className="space-y-4">
             <input
               type="text"
-              value={customPath}
-              onChange={(e) => setCustomPath(e.target.value)}
-              onKeyPress={handleKeyPress}
+              value={interests}
+              onChange={(e) => setInterests(e.target.value)}
               placeholder="e.g., Full Stack Developer, Data Scientist..."
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-white placeholder-gray-500"
             />
             <button
-              onClick={handleCustomSubmit}
-              disabled={!customPath.trim() || isLoading}
+              onClick={handleGenerateRoadmap}
+              disabled={!interests.trim() || isGenerating}
               className="w-full px-4 py-3 bg-gradient-to-r from-purple-500/80 to-indigo-500/80 hover:from-purple-500 hover:to-indigo-500 text-white rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
             >
-              {isLoading ? (
+              {isGenerating ? (
                 <>
                   <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

@@ -69,117 +69,52 @@ const TypingText = ({ content, onComplete }: { content: string; onComplete?: () 
   );
 };
 
-const CustomNode = ({ data, isConnectable }: any) => { 
+const CustomNode = ({ data, isConnectable }: any) => {
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [label, setLabel] = useState(data.label);
-  const [isCompleted, setIsCompleted] = useState(data.isCompleted || false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const nodeRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // Check if this node has already been animated
-    const animatedNodes = JSON.parse(localStorage.getItem('animatedNodes') || '[]');
-    const hasBeenAnimated = animatedNodes.includes(data.id);
-
-    if (data.shouldBeVisible) {
-      if (hasBeenAnimated) {
-        // If already animated before, show immediately without typing animation
-        setIsVisible(true);
-        setIsTyping(false);
-      } else {
-        // If not animated before, show with typing animation after delay
-        const showTimeout = setTimeout(() => {
-          setIsVisible(true);
-          setIsTyping(true);
-          // Store this node as animated
-          localStorage.setItem('animatedNodes', JSON.stringify([...animatedNodes, data.id]));
-        }, data.animationDelay || 0);
-        return () => clearTimeout(showTimeout);
-      }
-    }
-  }, [data.shouldBeVisible, data.animationDelay, data.id]);
-
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
-
-  const handleClick = () => {
-    router.push(`/roadmap/step/${data.id}`);
-  };
-
-  const handleBlur = () => {
-    setIsEditing(false);
-    if (data.onChange) data.onChange(label);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      setIsEditing(false);
-      if (data.onChange) data.onChange(label);
-    }
-  };
-
-  const toggleComplete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newState = !isCompleted;
-    setIsCompleted(newState);
-    if (data.onComplete) data.onComplete(newState);
-  };
-
-  if (!isVisible) return null;
+  // Don't show the node at all if it shouldn't be visible
+  if (!data.shouldBeVisible) return null;
 
   return (
-    <div 
-      className={`bg-white border-2 ${isCompleted ? 'border-purple-500/50' : 'border-gray-200'} 
-        rounded-lg shadow-lg p-4 w-[300px] relative group transition-all duration-500 
-        cursor-pointer hover:shadow-xl animate-nodeAppear`}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
+    <div
+      ref={nodeRef}
+      className="transition-all duration-500 ease-in-out"
+      style={{
+        background: data.style?.background || '#ffffff',
+        border: data.style?.border || '2px solid #e2e8f0',
+        borderRadius: '8px',
+        padding: '20px',
+        width: '300px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        opacity: 1
+      }}
     >
-      <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
-      <div className="absolute top-0 right-0">
-        <button
-          onClick={toggleComplete}
-          className={`w-0 h-0 border-[16px] transition-all duration-200
-            ${isCompleted 
-              ? 'border-t-purple-500 border-l-transparent border-b-transparent border-r-indigo-500 hover:border-t-purple-600 hover:border-r-indigo-600' 
-              : 'border-t-gray-200 border-l-transparent border-b-transparent border-r-gray-200 hover:border-t-gray-300 hover:border-r-gray-300'}`}
-        >
-        </button>
-      </div>
-      {isEditing ? (
-        <input
-          type="text"
-          value={label}
-          onChange={(e) => setLabel(e.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className="w-full px-3 py-2 text-base font-medium text-black bg-gray-50 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
-          autoFocus
-        />
-      ) : (
-        <div className="flex items-center justify-center w-full min-h-[48px] px-3">
-          <div className="w-full overflow-hidden">
-            {isTyping ? (
-              <TypingText 
-                content={label} 
-                onComplete={() => {
-                  if (data.onTypingComplete) {
-                    data.onTypingComplete(data.id);
-                  }
-                }} 
-              />
-            ) : (
-              <div className="text-base font-medium text-black text-center whitespace-pre-line">
-                {label}
-              </div>
-            )}
-          </div>
+      <div 
+        className="relative group cursor-pointer animate-nodeAppear"
+        onClick={() => router.push(`/roadmap/step/${data.id}`)}
+      >
+        <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
+        
+        <div className="min-h-[100px]">
+          {data.isTyping ? (
+            <TypingText 
+              content={data.label} 
+              onComplete={() => {
+                if (data.onTypingComplete) {
+                  data.onTypingComplete(data.id);
+                }
+              }}
+            />
+          ) : (
+            <div className="text-base font-medium whitespace-pre-line">
+              {data.label}
+            </div>
+          )}
         </div>
-      )}
-      <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
+
+        <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
+      </div>
     </div>
   );
 };
@@ -263,15 +198,13 @@ export default function DashboardPage() {
         id: item.id.toString(),
         type: 'custom',
         data: {
-          id: item.id.toString(),
-          label: item.label,
+          label: item.data.label,
           isCompleted: false,
-          shouldBeVisible: false,
-          isTyping: false,
-          animationDelay: index * 1500, // Increased delay between nodes
-          onTypingComplete: () => handleTypingComplete(item.id.toString()),
+          shouldBeVisible: true,
+          animationDelay: index * 1000
         },
         position: item.position,
+        style: item.style
       }));
 
       // Set initial nodes
@@ -404,6 +337,86 @@ export default function DashboardPage() {
 
   const handleSave = () => {
     console.log('Saving roadmap:', { nodes, edges });
+  };
+
+  const handleGenerateRoadmap = async (userInput: string) => {
+    try {
+      const response = await fetch('/api/generate-roadmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userInput }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch roadmap data');
+      }
+
+      const roadmapData = await response.json();
+      console.log('Received roadmap data:', roadmapData);
+      
+      if (!Array.isArray(roadmapData)) {
+        console.error('Expected array but got:', typeof roadmapData);
+        return;
+      }
+
+      // Clear previous state
+      setEdges([]);
+      setNodes([]);
+
+      // Create initial nodes (all invisible)
+      const newNodes = roadmapData.map((item: any, index: number) => ({
+        ...item,
+        data: {
+          ...item.data,
+          shouldBeVisible: false,
+          isTyping: false
+        }
+      }));
+
+      // Set initial nodes
+      setNodes(newNodes);
+
+      // Show nodes one by one with animations
+      let currentIndex = 0;
+      const showNextNode = () => {
+        if (currentIndex < newNodes.length) {
+          setNodes(prevNodes =>
+            prevNodes.map((node, idx) => ({
+              ...node,
+              data: {
+                ...node.data,
+                shouldBeVisible: idx <= currentIndex,
+                isTyping: idx === currentIndex
+              }
+            }))
+          );
+
+          // Create edge to previous node if not first node
+          if (currentIndex > 0) {
+            const newEdge = {
+              id: `e${currentIndex-1}-${currentIndex}`,
+              source: newNodes[currentIndex - 1].id,
+              target: newNodes[currentIndex].id,
+              type: 'smoothstep',
+              animated: true,
+              style: { stroke: '#2196f3', strokeWidth: 2 }
+            };
+            setEdges(prev => [...prev, newEdge]);
+          }
+
+          currentIndex++;
+          setTimeout(showNextNode, 3000); // Increased delay for better visibility
+        }
+      };
+
+      // Start the animation sequence
+      setTimeout(showNextNode, 500);
+      
+    } catch (error) {
+      console.error('Error generating roadmap:', error);
+    }
   };
 
   return (

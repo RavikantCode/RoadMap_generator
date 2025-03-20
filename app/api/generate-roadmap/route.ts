@@ -1,93 +1,107 @@
-import Groq from "groq-sdk";
+import axios from 'axios';
 import { NextResponse } from 'next/server';
 
-interface RoadmapSection {
-  name: string;
-  skills: string[];
-  resources: string[];
-  timeframe: string;
-  milestones: string[];
-}
-
-interface RoadmapResponse {
-  title: string;
-  sections: RoadmapSection[];
-  difficulty: "beginner" | "intermediate" | "advanced";
-}
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY
-});
-
-async function getRoadmap(userQuery: string) {
-  try {
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [
-        { 
-          role: "system", 
-          content: 'You are a frontend development career advisor. Return ONLY a JSON string without any additional text. Use this exact format:\n{\n  "title": "Frontend Development Roadmap",\n  "sections": [\n    {\n      "name": "Foundational Skills",\n      "skills": ["HTML5 Semantics", "CSS3 & Flexbox", "JavaScript ES6+"],\n      "resources": ["MDN Web Docs", "freeCodeCamp", "JavaScript.info"],\n      "timeframe": "2-3 months",\n      "milestones": ["Build responsive layouts", "Create interactive forms"]\n    }\n  ],\n  "difficulty": "beginner"\n}'
-        },
-        { 
-          role: "user", 
-          content: `Create a frontend roadmap for: ${userQuery}. Return ONLY valid JSON.` 
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000
-    });
-
-    const content = completion.choices[0]?.message?.content || "{}";
-    
+async function getRoadmap(data: any) {
     try {
-      // Ensure the response is valid JSON
-      const parsedContent = JSON.parse(content) as RoadmapResponse;
-      return NextResponse.json({ roadmap: parsedContent });
-    } catch (parseError) {
-      console.error("JSON Parse Error:", parseError);
-      // Return a fallback structured response
-      const fallbackResponse: RoadmapResponse = {
-        title: "Frontend Development Roadmap",
-        sections: [
-          {
-            name: "Error",
-            skills: ["Unable to generate roadmap"],
-            resources: ["Please try again"],
-            timeframe: "N/A",
-            milestones: ["Error occurred"]
-          }
-        ],
-        difficulty: "beginner"
-      };
-      return NextResponse.json({ roadmap: fallbackResponse });
+        const formattedData = {
+            skills: [],
+            experience_level: "Beginner",
+            interests: [data.userInput],
+            career_path: "Frontend Development",
+            learning_preference: "Course-based",
+            degree: "Computer Science",
+            branch: "Web Development",
+            certifications: ["html", "css", "javascript"]
+        };
+
+        const response = await axios.post('http://127.0.0.1:8000/generate_roadmap', formattedData);
+        
+     
+        const stepColors = [
+            { bg: '#e3f2fd', border: '#2196f3' }, 
+            { bg: '#f3e5f5', border: '#9c27b0' },
+            { bg: '#e8f5e9', border: '#4caf50' },
+            { bg: '#fff3e0', border: '#ff9800' }, 
+            { bg: '#f3e5f5', border: '#9c27b0' }  
+        ];
+
+       
+        const roadmapData = response.data.combined.roadmap.map((step: any, index: number) => ({
+            id: (index + 1).toString(),
+            type: 'custom',
+            position: { x: 250, y: index * 200 },
+            data: { 
+                id: (index + 1).toString(),
+                label: `Step ${index + 1}: ${step.title}\n${step.description || 'No description available'}`
+            },
+            style: {
+                background: stepColors[index % stepColors.length].bg,
+                color: '#000000',
+                padding: '20px',
+                border: `2px solid ${stepColors[index % stepColors.length].border}`,
+                borderRadius: '8px',
+                width: 300,
+                fontSize: '14px',
+                textAlign: 'left',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }
+        }));
+
+        const projectStartY = (roadmapData.length * 200) + 100;
+
+  
+        const projectNodes = response.data.combined.projects.map((project: any, index: number) => ({
+            id: `project-${index + 1}`,
+            type: 'custom',
+            position: { x: 250, y: (roadmapData.length + index) * 200 + 100 },
+            data: { 
+                id: `project-${index + 1}`,
+                label: `Project: ${project.name}\n${project.description || 'No description available'}`
+            },
+            style: {
+                background: '#fff8e1', 
+                color: '#000000',
+                padding: '20px',
+                border: '2px solid #ffc107',
+                borderRadius: '8px',
+                width: 300,
+                fontSize: '14px',
+                textAlign: 'left',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }
+        }));
+
+        return [...roadmapData, ...projectNodes];
+
+    } catch (error) {
+        console.error("Error in getRoadmap:", error);
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Response data:", error.response.data);
+            throw new Error(`API Error: ${error.response.data.detail || error.message}`);
+        }
+        throw error;
     }
-  } catch (error) {
-    console.error("Groq API Error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to generate roadmap" },
-      { status: 500 }
-    );
-  }
 }
 
 export async function POST(req: Request) {
-  try {
-    const { userInput } = await req.json();
-    
-    if (!userInput) {
-      return NextResponse.json(
-        { error: "User input is required" },
-        { status: 400 }
-      );
-    }
+    try {
+        const data = await req.json();
+        
+        if (!data || !data.userInput) {
+            return NextResponse.json(
+                { error: "User input is required" },
+                { status: 400 }
+            );
+        }
 
-    return getRoadmap(userInput);
-    
-  } catch (error) {
-    console.error("API Route Error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to process request" },
-      { status: 500 }
-    );
-  }
+        const nodes = await getRoadmap(data);
+        return NextResponse.json(nodes);
+        
+    } catch (error) {
+        console.error("API Route Error:", error);
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Failed to process request" },
+            { status: 500 }
+        );
+    }
 }

@@ -34,17 +34,13 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      {/* Static gradient background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 opacity-30" />
       </div>
       
-      {/* Content */}
       <div className="relative z-10">
-        {/* Hero Section */}
         <div className="min-h-screen">
           <div className="container mx-auto px-6 py-12">
-            {/* Navigation */}
             <nav className="flex justify-between items-center mb-20">
               <Link href="/">
                
@@ -55,20 +51,17 @@ const LandingPage: React.FC = () => {
               <div className="flex items-center gap-6">
                 <Link 
                   href="/login"
-                  className="text-gray-400 hover:text-white transition"
-                >
+                  className="text-gray-400 hover:text-white transition">
                   Log in
                 </Link>
                 <Link 
                   href="/signup"
-                  className="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition"
-                >
+                  className="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-200 transition">
                   Sign up
                 </Link>
               </div>
             </nav>
 
-            {/* Hero Content */}
             <div className="max-w-6xl mx-auto text-center hero-text pt-20">
               <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 AI-Powered Career Guidance

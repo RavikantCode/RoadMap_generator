@@ -68,37 +68,63 @@ export default function RecommendationsPage() {
     if (!interests.trim()) return;
 
     setIsGenerating(true);
-    // Simulating API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/generate-roadmap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          skills: [],
+          experience_level: "Beginner",
+          interests: [interests],
+          career_path: interests,
+          learning_preference: "Course-based",
+          degree: "B.Tech",
+          branch: "Data Science",
+        }),
+      });
 
-    // Example recommendations based on interests
-    // In a real app, this would come from an AI model
-    const newRecommendations: Recommendation[] = [
-      {
-        title: `Learn ${interests} Fundamentals`,
-        description: `Master the core concepts and principles of ${interests}.`,
-        icon: IconCode,
-        color: 'from-blue-500/80 to-cyan-500/80',
-        type: 'course'
-      },
-      {
-        title: `Build a ${interests} Project`,
-        description: `Create a complete project using ${interests} and related technologies.`,
-        icon: IconRocket,
-        color: 'from-purple-500/80 to-pink-500/80',
-        type: 'project'
-      },
-      {
-        title: `${interests} Best Practices`,
-        description: 'Learn industry-standard practices and patterns.',
-        icon: IconBrain,
-        color: 'from-yellow-500/80 to-orange-500/80',
-        type: 'skill'
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    ];
 
-    setRecommendations(newRecommendations);
-    setIsGenerating(false);
+      const data = await response.json();
+      console.log('API response:', data); // Debug log
+
+      if (!data || !data.roadmap || !Array.isArray(data.roadmap)) {
+        throw new Error('Invalid response format: missing roadmap array');
+      }
+
+      // Transform the API response into recommendations
+      const newRecommendations: Recommendation[] = data.roadmap.map((step: any, index: number) => ({
+        title: `Step ${index + 1}: ${step.title || step.name || 'Learning Step'}`,
+        description: step.description || 'Master this skill or concept',
+        icon: [IconCode, IconRocket, IconBrain, IconDeviceLaptop, IconChartBar, IconBulb][index % 6],
+        color: [
+          'from-blue-500/80 to-cyan-500/80',
+          'from-purple-500/80 to-pink-500/80',
+          'from-yellow-500/80 to-orange-500/80',
+          'from-green-500/80 to-emerald-500/80',
+          'from-red-500/80 to-orange-500/80',
+          'from-blue-500/80 to-indigo-500/80'
+        ][index % 6],
+        type: step.type || 'course'
+      }));
+
+      setRecommendations(newRecommendations);
+    } catch (error) {
+      console.error('Error generating roadmap:', error);
+      setRecommendations([{
+        title: 'Error Generating Roadmap',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        icon: IconBrain,
+        color: 'from-red-500/80 to-red-600/80',
+        type: 'course'
+      }]);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (

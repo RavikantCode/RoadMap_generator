@@ -6,15 +6,14 @@ import Link from 'next/link';
 const Footer = () => {
   return (
     <footer className="relative overflow-hidden">
-      {/* Background Elements */}
+     
       <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-900/10 to-black" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
       
       <div className="relative z-10 px-6 pt-20 pb-12">
         <div className="max-w-7xl mx-auto">
-          {/* Main Footer Content */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Brand Section */}
+           
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -39,8 +38,6 @@ const Footer = () => {
                 </a>
               </div>
             </div>
-
-            {/* Quick Links */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Quick Links
@@ -63,8 +60,6 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
-
-            {/* Resources */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Resources
@@ -88,8 +83,6 @@ const Footer = () => {
               </ul>
             </div>
           </div>
-
-          {/* Bottom Bar */}
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
               <div className="flex flex-wrap justify-center gap-6">

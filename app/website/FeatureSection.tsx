@@ -8,7 +8,7 @@ const FeatureSection = () => {
 
   React.useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animate elements that are already visible
+      
       gsap.from('.feature-content', { 
         opacity: 0, 
         x: -30, 
@@ -37,13 +37,13 @@ const FeatureSection = () => {
 
   return (
     <section ref={sectionRef} className="relative py-24 overflow-hidden">
-      {/* Background Elements */}
+    
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
       <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-gradient-to-br from-purple-500/10 to-transparent blur-3xl -z-10" />
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
+     
           <div className="feature-content space-y-8">
             <div>
               <p className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 font-semibold text-lg mb-4">
@@ -62,7 +62,7 @@ const FeatureSection = () => {
               </p>
             </div>
 
-            {/* Feature Cards */}
+         
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
               <div className="feature-card group">
                 <div className="p-6 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 hover:border-blue-500/50 transition-all duration-300">
@@ -94,14 +94,14 @@ const FeatureSection = () => {
             </div>
           </div>
 
-          {/* Right Visual */}
+         
           <div className="feature-visual relative">
-            {/* Decorative Elements */}
+         
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl -z-10" />
             
-            {/* Main Visual Container */}
+          
             <div className="relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl backdrop-blur-sm border border-white/10 p-8">
-              {/* Interactive Visual Placeholder */}
+           
               <div className="aspect-video relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-500/5 to-purple-500/5 backdrop-blur-md">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
@@ -112,7 +112,7 @@ const FeatureSection = () => {
                 </div>
               </div>
 
-              {/* Stats or Additional Info */}
+             
               <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="p-4 bg-white/5 rounded-xl border border-white/10">
                   <FaClock className="text-xl text-purple-400 mb-2" />
