@@ -15,9 +15,9 @@ export default function RoadmapsPage() {
   const [roadmaps, setRoadmaps] = React.useState<Roadmap[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  // This would be replaced with your actual API call
+  
   React.useEffect(() => {
-    // Simulating API call
+  
     setTimeout(() => {
       setRoadmaps([
         {
@@ -54,7 +54,6 @@ export default function RoadmapsPage() {
         </button>
       </div>
 
-      {/* Roadmap Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {roadmaps.map((roadmap) => (
           <div key={roadmap.id} className="group h-[280px]">

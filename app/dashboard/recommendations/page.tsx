@@ -90,13 +90,12 @@ export default function RecommendationsPage() {
       }
 
       const data = await response.json();
-      console.log('API response:', data); // Debug log
+      console.log('API response:', data);
 
       if (!data || !data.roadmap || !Array.isArray(data.roadmap)) {
         throw new Error('Invalid response format: missing roadmap array');
       }
 
-      // Transform the API response into recommendations
       const newRecommendations: Recommendation[] = data.roadmap.map((step: any, index: number) => ({
         title: `Step ${index + 1}: ${step.title || step.name || 'Learning Step'}`,
         description: step.description || 'Master this skill or concept',
@@ -136,7 +135,7 @@ export default function RecommendationsPage() {
         <p className="text-gray-400 mt-2">Get personalized learning roadmaps based on your interests</p>
       </div>
 
-      {/* Input Section */}
+
       <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl p-6">
         <div className="max-w-2xl">
           <label htmlFor="interests" className="block text-white font-medium mb-2">
@@ -181,7 +180,7 @@ export default function RecommendationsPage() {
 
       {recommendations.length > 0 && (
         <>
-          {/* Filter Buttons */}
+  
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedType(null)}
@@ -208,7 +207,6 @@ export default function RecommendationsPage() {
             ))}
           </div>
 
-          {/* Recommendations Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {(selectedType ? recommendations.filter(rec => rec.type === selectedType) : recommendations).map((rec, index) => {
               const Icon = rec.icon;

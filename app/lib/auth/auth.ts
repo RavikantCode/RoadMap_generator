@@ -1,6 +1,4 @@
 
-//==================================================================================================================
-
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from 'bcrypt';
@@ -22,35 +20,35 @@ export const authOptions = {
                 }
 
                 try {
-                    // Find existing user
+               
                     const existingUser = await prisma.user.findUnique({
                         where: {
                             email: credentials.email
                         }
                     });
 
-                    // If user doesn't exist, throw error
+                
                     if (!existingUser) {
                         throw new Error('No user found with this email');
                     }
 
-                    // Check if password exists (might be null for OAuth users)
+              
                     if (!existingUser.password) {
                         throw new Error('Password not set for this account');
                     }
 
-                    // Compare passwords with bcrypt
+                  
                     const passwordMatch = await bcrypt.compare(
                         credentials.password,
                         existingUser.password
                     );
 
-                    // If passwords don't match, throw error
+                
                     if (!passwordMatch) {
                         throw new Error('Incorrect password');
                     }
 
-                    // Return user data
+                 
                     return {
                         id: existingUser.id,
                         name: existingUser.name,
@@ -72,20 +70,20 @@ export const authOptions = {
     callbacks: {
         async signIn({ user, account }: any) {
             if (account.provider === 'google') {
-                // Check if the user already exists
+             
                 const userExists = await prisma.user.findUnique({
                     where: {
                         email: user.email
                     }
                 });
                 
-                // If they don't exist, create a user without password
+             
                 if (!userExists) {
                     await prisma.user.create({
                         data: {
                             email: user.email,
                             name: user.name,
-                            // No password needed for Google users
+                            
                         }
                     });
                 }
@@ -112,7 +110,7 @@ export const authOptions = {
         }
     },
     pages: {
-        signIn: "/login",  // Changed from "/signup" to "/login"
+        signIn: "/login", 
     },
-    // Add error handling for authentication
+   
 };
