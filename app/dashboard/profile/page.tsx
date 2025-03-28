@@ -58,6 +58,8 @@ export default function ProfilePage() {
     interests: [],
     projects: [],
   });
+  console.log(formData);
+  
 
   const handleEducationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
