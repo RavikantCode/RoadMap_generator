@@ -17,7 +17,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import AISuggestionModal from '../components/AISuggestionModal';
 
-// Typing Animation Component
 const TypingText = ({ content, onComplete }: { content: string; onComplete?: () => void }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,14 +35,14 @@ const TypingText = ({ content, onComplete }: { content: string; onComplete?: () 
             return [...prevLines, currentLine.slice(0, currentIndex + 1)].join('\n');
           });
           setCurrentIndex(prev => prev + 1);
-        }, 50); // Slower typing speed for better readability
+        }, 50);
 
         return () => clearTimeout(typingInterval);
       } else {
         const lineChangeTimeout = setTimeout(() => {
           setLineIndex(prev => prev + 1);
           setCurrentIndex(0);
-        }, 500); // Longer pause between lines
+        }, 500);
 
         return () => clearTimeout(lineChangeTimeout);
       }
@@ -73,7 +72,6 @@ const CustomNode = ({ data, isConnectable }: any) => {
   const router = useRouter();
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  // Don't show the node at all if it shouldn't be visible
   if (!data.shouldBeVisible) return null;
 
   return (
@@ -123,43 +121,10 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-const defaultNodes: Node[] = [
-  {
-    id: '1',
-    type: 'custom',
-    data: { 
-      id: '1',
-      label: 'Learn HTML & CSS\n• HTML5 structure\n• CSS3 styling\n• Responsive design\n• CSS Grid & Flexbox', 
-      isCompleted: false,
-    },
-    position: { x: 250, y: 0 },
-  },
-  {
-    id: '2',
-    type: 'custom',
-    data: { 
-      id: '2',
-      label: 'JavaScript Fundamentals\n• Core concepts\n• DOM manipulation\n• ES6+ features\n• Async programming', 
-      isCompleted: false,
-    },
-    position: { x: 250, y: 200 },
-  },
-  {
-    id: '3',
-    type: 'custom',
-    data: { 
-      id: '3',
-      label: 'React Fundamentals\n• Components\n• State & Props\n• Hooks\n• React Router', 
-      isCompleted: false,
-    },
-    position: { x: 250, y: 400 },
-  },
-];
 
-// Helper function to generate consistent edge IDs
 const getEdgeId = (source: string, target: string) => `e${source}-${target}`;
 
-// Helper function to create an edge with validation
+
 const createEdge = (source: string, target: string): Edge => {
   if (!source || !target) {
     throw new Error('Both source and target are required for edge creation');
@@ -174,10 +139,6 @@ const createEdge = (source: string, target: string): Edge => {
   };
 };
 
-const defaultEdges: Edge[] = [
-  createEdge('1', '2'),
-  createEdge('2', '3'),
-];
 
 export default function DashboardPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -189,11 +150,10 @@ export default function DashboardPage() {
     try {
       console.log('Received roadmap data in dashboard:', roadmapData);
       
-      // Clear previous state
+     
       setEdges([]);
       setNodes([]);
 
-      // Create nodes with animation delays
       const newNodes = roadmapData.map((item: any, index: number) => ({
         id: item.id.toString(),
         type: 'custom',
@@ -207,10 +167,8 @@ export default function DashboardPage() {
         style: item.style
       }));
 
-      // Set initial nodes
       setNodes(newNodes);
 
-      // Show nodes one by one with animations
       let currentIndex = 0;
       const showNextNode = () => {
         if (currentIndex < newNodes.length) {
@@ -225,7 +183,6 @@ export default function DashboardPage() {
             }))
           );
 
-          // Create edge to previous node
           if (currentIndex > 0) {
             const newEdge = {
               id: `e${currentIndex-1}-${currentIndex}`,
@@ -239,11 +196,10 @@ export default function DashboardPage() {
           }
 
           currentIndex++;
-          setTimeout(showNextNode, 2000); // Wait for typing animation to complete
+          setTimeout(showNextNode, 2000);
         }
       };
 
-      // Start showing nodes after a short delay
       setTimeout(showNextNode, 500);
 
     } catch (error) {
@@ -272,11 +228,9 @@ export default function DashboardPage() {
     try {
       const edge = createEdge(source, target);
       setEdges(prevEdges => {
-        // Check if edge already exists
         const exists = prevEdges.some(e => e.id === edge.id);
         if (exists) return prevEdges;
         
-        // Add new edge
         return [...prevEdges, edge];
       });
     } catch (error) {
@@ -290,7 +244,6 @@ export default function DashboardPage() {
     );
   }, []);
 
-  // Initialize nodes with event handlers
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => ({
@@ -361,11 +314,9 @@ export default function DashboardPage() {
         return;
       }
 
-      // Clear previous state
       setEdges([]);
       setNodes([]);
 
-      // Create initial nodes (all invisible)
       const newNodes = roadmapData.map((item: any, index: number) => ({
         ...item,
         data: {
@@ -375,10 +326,9 @@ export default function DashboardPage() {
         }
       }));
 
-      // Set initial nodes
       setNodes(newNodes);
 
-      // Show nodes one by one with animations
+
       let currentIndex = 0;
       const showNextNode = () => {
         if (currentIndex < newNodes.length) {
@@ -393,7 +343,6 @@ export default function DashboardPage() {
             }))
           );
 
-          // Create edge to previous node if not first node
           if (currentIndex > 0) {
             const newEdge = {
               id: `e${currentIndex-1}-${currentIndex}`,
@@ -407,11 +356,10 @@ export default function DashboardPage() {
           }
 
           currentIndex++;
-          setTimeout(showNextNode, 3000); // Increased delay for better visibility
+          setTimeout(showNextNode, 3000);
         }
       };
 
-      // Start the animation sequence
       setTimeout(showNextNode, 500);
       
     } catch (error) {
@@ -497,7 +445,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Animation Styles */}
       <style jsx global>{`
         @keyframes blink {
           0%, 100% { opacity: 1; }

@@ -15,9 +15,9 @@
 //   const [trendingData, setTrendingData] = React.useState<TrendData[]>([]);
 //   const [activeTab, setActiveTab] = React.useState<'jobs' | 'technologies' | 'skills'>('jobs');
 
-//   // This would be replaced with your actual API call
+//   
 //   React.useEffect(() => {
-//     // Example data - replace with actual API data
+//   
 //     const mockData: TrendData[] = [
 //       
 //         title: 'AI Engineer',
@@ -53,7 +53,7 @@
 //         <p className="text-gray-600">Stay updated with the latest trends in technology</p>
 //       </div>
 
-//       {/* Tabs */}
+//     
 //       <div className="flex space-x-4 border-b border-gray-200">
 //         <button
 //           onClick={() => setActiveTab('jobs')}
@@ -87,7 +87,7 @@
 //         </button>
 //       </div>
 
-//       {/* Trend Cards */}
+//      
 //       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 //         {filteredData.map((item, index) => (
 //           <div key={index} className="bg-white rounded-xl shadow-lg p-6">

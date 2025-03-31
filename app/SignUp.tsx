@@ -34,11 +34,11 @@ const SignupPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden antialiased">
-      {/* Static gradient background */}
+   
       <div className="fixed inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 opacity-30" />
       
       <div className="container mx-auto px-6 py-12 relative z-10">
-        {/* Navigation */}
+
         <nav className="flex justify-between items-center mb-16">
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -60,7 +60,7 @@ const SignupPage = () => {
             <p className="text-gray-400 mb-8">Start your career journey</p>
 
             <div className="space-y-6">
-              {/* Google Sign-in */}
+          
               <button 
                 type="button"
                 onClick={handleGoogleSignIn}
@@ -79,7 +79,7 @@ const SignupPage = () => {
                 </div>
               </div>
 
-              {/* Form */}
+    
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-gray-300">

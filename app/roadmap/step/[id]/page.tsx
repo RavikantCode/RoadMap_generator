@@ -67,7 +67,6 @@ export default function StepPage() {
   const handleSave = () => {
     setStep(editedStep);
     setIsEditing(false);
-    // Here you would typically make an API call to save the changes
     console.log('Saving changes:', editedStep);
   };
 
@@ -78,7 +77,6 @@ export default function StepPage() {
 
   return (
     <div className="min-h-screen relative py-8 px-4 overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
       

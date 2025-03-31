@@ -55,11 +55,9 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0F]">
-      {/* Background gradients */}
       <div className="fixed inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
       <div className="fixed right-0 top-1/4 w-1/2 h-1/2 bg-gradient-to-br from-purple-500/10 to-transparent blur-3xl" />
       
-      {/* Sidebar */}
       <aside 
         className={`bg-black/20 backdrop-blur-xl border-r border-white/10 p-4 fixed h-full transition-all duration-300 z-20 ${
           isCollapsed ? 'w-16' : 'w-64'
@@ -80,7 +78,6 @@ export default function DashboardLayout({
         </div>
 
         <nav className="space-y-1">
-          {/* Main Navigation */}
           <div className="pb-4">
             {!isCollapsed && (
               <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
@@ -91,7 +88,6 @@ export default function DashboardLayout({
             <SidebarItem icon={IconUser} text="Profile" href="/dashboard/profile" isCollapsed={isCollapsed} />
           </div>
 
-          {/* Roadmaps Section */}
           <div className="py-4 border-t border-white/10">
             {!isCollapsed && (
               <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
@@ -102,7 +98,6 @@ export default function DashboardLayout({
             <SidebarItem icon={IconRobot} text="AI Recommendations" href="/dashboard/recommendations" isCollapsed={isCollapsed} />
           </div>
 
-          {/* Resources Section */}
           <div className="py-4 border-t border-white/10">
             {!isCollapsed && (
               <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
@@ -113,19 +108,15 @@ export default function DashboardLayout({
             <SidebarItem icon={IconBook} text="Courses" href="/dashboard/courses" isCollapsed={isCollapsed} />
           </div>
 
-          {/* Settings Section */}
           <div className="py-4 border-t border-white/10 mt-auto">
             <SidebarItem icon={IconSettings} text="Settings" href="/dashboard/settings" isCollapsed={isCollapsed} />
           </div>
         </nav>
       </aside>
 
-      {/* Main Content */}
       <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'ml-16' : 'ml-64'}`}>
-        {/* Navbar */}
         <Navbar isCollapsed={isCollapsed} />
 
-        {/* Main Content Area */}
         <main className="pt-16 p-6 relative z-10">
           {children}
         </main>

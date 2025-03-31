@@ -102,7 +102,7 @@ export default function CertificationsForm({ certifications, onAdd, onRemove }: 
         </button>
       </form>
 
-      {/* List of Added Certifications */}
+ 
       <div className="space-y-4 mt-8">
         {certifications.map((cert, index) => (
           <div

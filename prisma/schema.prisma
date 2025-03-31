@@ -28,11 +28,12 @@ model User {
   updatedAt     DateTime                 @updatedAt
   role          ROLE                     @default(BEGINNER)
 
-  academics     USER_ACADEMICS_DETAILS? // One-to-one relationship
-  certification USER_CERTIFICATION[]     // One-to-many relationship
-  interest      USER_INTEREST[]          // One-to-many relationship
+  academics     USER_ACADEMICS_DETAILS?
+  certification USER_CERTIFICATION[]     
+  interest      USER_INTEREST[]        
   jobs          Job[]
   roadmaps      RoadMaps[]
+  skills        Skills?
 }
 
 model USER_ACADEMICS_DETAILS {
@@ -132,4 +133,12 @@ model Job {
   company_name String
   salary_range String
   posted_at    DateTime
+}
+
+model Skills{
+  id          String  @id @default(cuid())
+  user_id      String  @unique
+  user        User @relation(fields:[user_id],references:[id],onDelete:Cascade)
+  technical  String[]
+  soft        String[]
 }

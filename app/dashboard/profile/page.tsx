@@ -5,6 +5,7 @@ import EducationForm from './EducationForm';
 import CertificationsForm from './CertificationsForm';
 import SkillsForm from './SkillsForm';
 import ProjectsForm from './ProjectsForm';
+import { useSession } from 'next-auth/react';
 
 interface Education {
   tenthBoard: string;
@@ -59,6 +60,13 @@ export default function ProfilePage() {
     projects: [],
   });
   console.log(formData);
+
+  //============================== added to get session 
+
+  const {data:session} = useSession();
+  console.log(session);
+  
+  //============================ 
   
 
   const handleEducationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -100,15 +108,17 @@ export default function ProfilePage() {
   };
 
   const handleProjectAdd = (project: Project) => {
-    // Create a completely new project object to avoid any reference issues
+ 
     const newProject = {
+
+
       name: project.name,
       description: project.description,
-      techStack: [...project.techStack], // Create a new array for tech stack
+      techStack: [...project.techStack], 
       url: project.url
     };
     
-    // Use functional update to ensure we have the latest state
+   
     setFormData(prevData => ({
       ...prevData,
       projects: [...prevData.projects, newProject]
@@ -123,8 +133,73 @@ export default function ProfilePage() {
   };
 
   const handleSubmit = async () => {
-    // Here you would typically send the data to your backend
-    console.log('Profile Data:', formData);
+   
+  
+   
+    // const userId = session?.user?.id;
+    
+
+    if (!session || !session.user || !session.user.email) {
+      alert('User is not logged in or email is missing');
+      return;
+    }
+
+    // const transformedData = {
+    //   userId: userId,
+    //   education: {
+    //     marks_10th_percentage: formData.education.tenthMarks,
+    //     marks_12th_percentage: formData.education.twelfthMarks,
+    //     college_cgpa: formData.education.currentCGPA ? formData.education.currentCGPA : null,
+    //     degree: formData.education.degree || '',
+    //     branch: formData.education.branch || '',
+    //   },
+    //   certifications: formData.certifications.map(cert => ({
+    //     certificate_name: cert.name,
+    //     platform: cert.issuer,
+    //     issued_at: cert.date,
+    //   })),
+    //   interests: formData.interests,
+    //   skills: {
+    //     technical: formData.skills.technical,
+    //     soft: formData.skills.soft,
+    //   },
+    //   projects: formData.projects.map(project => ({
+    //     job_title: project.name,
+    //     company_name: project.description,
+    //     salary_range: project.url || '',
+    //   })),
+    // };
+  
+    console.log('Sending profile data:', );
+  
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: session.user.email,            //added email to insert in db--prisma
+          education: formData.education,
+          certifications: formData.certifications,
+          interests: formData.interests,
+          skills: formData.skills,
+          projects: formData.projects,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save profile');
+      }
+  
+      const result = await response.json();
+      alert('Profile saved successfully!');
+      console.log('Saved Profile:', result.profile);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert(`Failed to save profile: ${(error as Error).message}`);
+    }
   };
 
   const steps = [
@@ -179,7 +254,7 @@ export default function ProfilePage() {
         <p className="text-gray-400 mt-2">Build your professional profile to get personalized roadmap recommendations</p>
       </div>
 
-      {/* Progress Steps */}
+
       <div className="flex justify-between items-center mb-8">
         {steps.map((step, index) => (
           <div
@@ -210,11 +285,11 @@ export default function ProfilePage() {
         ))}
       </div>
 
-      {/* Form Steps */}
+     
       <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-xl p-6">
         {steps[currentStep - 1].component}
 
-        {/* Navigation Buttons */}
+      
         <div className="flex justify-between mt-8">
           {currentStep > 1 && (
             <button

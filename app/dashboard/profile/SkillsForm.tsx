@@ -70,7 +70,7 @@ export default function SkillsForm({ skills, interests, onSkillsChange, onIntere
 
   return (
     <div className="space-y-8">
-      {/* Technical Skills */}
+    
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <IconCode className="text-blue-400" size={24} />
@@ -111,7 +111,6 @@ export default function SkillsForm({ skills, interests, onSkillsChange, onIntere
         </div>
       </div>
 
-      {/* Soft Skills */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <IconBulb className="text-purple-400" size={24} />
@@ -152,7 +151,6 @@ export default function SkillsForm({ skills, interests, onSkillsChange, onIntere
         </div>
       </div>
 
-      {/* Interests */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <IconBulb className="text-pink-400" size={24} />
