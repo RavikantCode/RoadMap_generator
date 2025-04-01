@@ -32,10 +32,10 @@ export default function CoursesPage() {
             page_size: 10,
             query: 'python' //change with the hekp of search bar
           },
-          headers: {
-            'x-rapidapi-key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '0b48b27795msh5c6ff822e507ba0p1a41edjsn5289a1a5b906',
-            'x-rapidapi-host': 'udemy-paid-courses-for-free-api.p.rapidapi.com'
-          }
+          // headers: {
+          //   'x-rapidapi-key': process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '0b48b27795msh5c6ff822e507ba0p1a41edjsn5289a1a5b906',
+          //   'x-rapidapi-host': 'udemy-paid-courses-for-free-api.p.rapidapi.com'
+          // }
         });
 
         console.log('Full API Response:', response.data);

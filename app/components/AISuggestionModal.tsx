@@ -42,7 +42,7 @@ export default function AISuggestionModal({ isOpen, onClose, onSelect }: AISugge
       }
 
       const data = await response.json();
-      console.log('Received roadmap data:', data);
+      console.log('Received roadmap dataaa:', data);
       
       onSelect(data);
       onClose();

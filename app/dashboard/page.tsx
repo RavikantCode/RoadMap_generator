@@ -16,6 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import AISuggestionModal from '../components/AISuggestionModal';
+import { useRoadmap } from '../lib/auth/RoadmapContext';
 
 const TypingText = ({ content, onComplete }: { content: string; onComplete?: () => void }) => {
   const [displayedContent, setDisplayedContent] = useState('');
@@ -68,11 +69,23 @@ const TypingText = ({ content, onComplete }: { content: string; onComplete?: () 
   );
 };
 
-const CustomNode = ({ data, isConnectable }: any) => {
+const CustomNode = ({ id, data, isConnectable }: any) => {
   const router = useRouter();
   const nodeRef = useRef<HTMLDivElement>(null);
 
   if (!data.shouldBeVisible) return null;
+
+  const handleNodeClick = () => {
+    console.log("Node root ID:", id);
+    console.log("Node data:", data);
+    
+    if (id) {
+      console.log("Navigating to:", `/roadmap/step/${id}`);
+      router.push(`/roadmap/step/${id}`);
+    } else {
+      console.error("Node ID is undefined or empty");
+    }
+  };
 
   return (
     <div
@@ -90,7 +103,7 @@ const CustomNode = ({ data, isConnectable }: any) => {
     >
       <div 
         className="relative group cursor-pointer animate-nodeAppear"
-        onClick={() => router.push(`/roadmap/step/${data.id}`)}
+        onClick={handleNodeClick}
       >
         <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
         
@@ -100,7 +113,7 @@ const CustomNode = ({ data, isConnectable }: any) => {
               content={data.label} 
               onComplete={() => {
                 if (data.onTypingComplete) {
-                  data.onTypingComplete(data.id);
+                  data.onTypingComplete(id);
                 }
               }}
             />
@@ -121,9 +134,7 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-
 const getEdgeId = (source: string, target: string) => `e${source}-${target}`;
-
 
 const createEdge = (source: string, target: string): Edge => {
   if (!source || !target) {
@@ -139,29 +150,35 @@ const createEdge = (source: string, target: string): Edge => {
   };
 };
 
-
 export default function DashboardPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const { updateRoadmap } = useRoadmap();
+
+  useEffect(() => {
+    updateRoadmap(nodes, edges);
+  }, [nodes, edges, updateRoadmap]);
 
   const handleCareerSelect = useCallback((roadmapData: any[]) => {
     try {
-      console.log('Received roadmap data in dashboard:', roadmapData);
+      console.log('Received roadmap data in dashboarddd:', roadmapData);
       
-     
       setEdges([]);
       setNodes([]);
 
       const newNodes = roadmapData.map((item: any, index: number) => ({
-        id: item.id.toString(),
+        id: item.id.toString(), 
         type: 'custom',
         data: {
           label: item.data.label,
+          description: item.data.description || '',
+          resources: item.data.resources || [],
+          prerequisites: item.data.prerequisites || [],
+          nextSteps: item.data.nextSteps || '',
           isCompleted: false,
           shouldBeVisible: true,
-          animationDelay: index * 1000
         },
         position: item.position,
         style: item.style
@@ -206,6 +223,15 @@ export default function DashboardPage() {
       console.error('Error processing roadmap data:', error);
     }
   }, []);
+
+
+
+
+  const handleSave = () => {
+    console.log('Saving roadmap:', { nodes, edges });
+    //integrate ravi
+  };
+
 
   const handleTypingComplete = useCallback((nodeId: string) => {
     console.log('Typing complete for node:', nodeId);
@@ -288,10 +314,6 @@ export default function DashboardPage() {
     );
   }, [setNodes, handleTypingComplete]);
 
-  const handleSave = () => {
-    console.log('Saving roadmap:', { nodes, edges });
-  };
-
   const handleGenerateRoadmap = async (userInput: string) => {
     try {
       const response = await fetch('/api/generate-roadmap', {
@@ -369,6 +391,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen w-full relative">
+     
       <div className="absolute top-4 right-4 z-10 flex gap-4">
         <button
           onClick={() => setIsAIModalOpen(true)}
@@ -421,13 +444,12 @@ export default function DashboardPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center p-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">My Learning Roadmap</h1>
-            <p className="text-gray-600">Step-by-step visualization of your learning journey</p>
-            <p className="text-sm text-gray-500 mt-1">Double-click any node to edit its content</p>
+            <h1 className="text-2xl font-bold text-gray-400">My Learning Roadmap</h1>
+            <p className="text-gray-400">Step-by-step visualization of your learning journey</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6 h-[600px]">
+        <div className="bg-white rounded-xl shadow-lg p-2 h-[600px]">
           <ReactFlow
             nodes={nodes}
             edges={edges}
